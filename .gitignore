@@ -1,6 +1,3 @@
-/bin
-/include
-/lib
-pyvenv.cfg
 /__pycache__
-data.json
+/venv
+data/data.json
