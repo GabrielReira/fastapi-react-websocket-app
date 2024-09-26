@@ -6,31 +6,33 @@ import json
 app = FastAPI()
 DATABASE = 'data/data.json'
 
-class Item(BaseModel):
+class Product(BaseModel):
     name: str
+    weight: float = None
+    price: float = None
     description: str = None
 
 @app.get('/')
 async def root():
     return {'status': 'ok'}
 
-@app.get('/items/')
-async def get_items():
+@app.get('/products/')
+async def get_products():
     return read_db()
 
-@app.get('/items/{item_id}')
-async def get_item(item_id: int):
-    items = read_db()
-    if item_id < 0 or item_id >= len(items):
-        return HTTPException(status_code=404, detail='Item not found')
-    return {'item': items[item_id]}
+@app.get('/products/{product_id}')
+async def get_product(product_id: int):
+    products = read_db()
+    if product_id < 0 or product_id >= len(products):
+        return HTTPException(status_code=404, detail='Product not found')
+    return {'product': products[product_id]}
 
-@app.post('/items/')
-async def create_item(item: Item):
+@app.post('/products/')
+async def create_product(product: Product):
     db = read_db()
-    db.append(item.model_dump())
+    db.append(product.model_dump())
     write_db(db)
-    return {'result': item}
+    return {'result': product}
 
 def read_db():
     try:
