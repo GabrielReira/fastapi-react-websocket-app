@@ -8,12 +8,26 @@ function App() {
   const [description, setDescription] = useState('');
 
   useEffect (() => {
+    // HTTP first request to load products
     fetch('http://localhost:8000/products/')
       .then((response) => response.json())
       .then((data) => setProducts(data))
       .catch((error) => console.error(error))
+
+    // Connect to WebSocket to retrieve newly products in real-time
+    const socket = new WebSocket('ws://localhost:8000/ws');
+    socket.onmessage = (event) => {
+      const updateProducts = JSON.parse(event.data);
+      setProducts(updateProducts);
+    }
+    socket.onerror = (error) => {
+      console.error(error);
+    }
+
+    return () => socket.close();
   }, []);
 
+  // HTTP request to create a new product
   const handleSubmit = (e) => {
     e.preventDefault();
     const newProduct = {
@@ -28,8 +42,7 @@ function App() {
       body: JSON.stringify(newProduct)
     })
       .then((response) => response.json())
-      .then((data) => {
-        setProducts([...products, data.result]);
+      .then(() => {
         setName('');
         setWeight('');
         setPrice('');
@@ -42,10 +55,10 @@ function App() {
       <h2>Create a Product</h2>
       <form onSubmit={handleSubmit}>
         <input type='text' value={name} placeholder='Name' onChange={e => setName(e.target.value)} />
-        <input type='text' value={weight} placeholder='Name' onChange={e => setWeight(e.target.value)} />
-        <input type='text' value={price} placeholder='Name' onChange={e => setPrice(e.target.value)} />
-        <input type='text' value={description} placeholder='Name' onChange={e => setDescription(e.target.value)} />
-        <button type='submit'>CREATE</button>
+        <input type='text' value={weight} placeholder='Weight' onChange={e => setWeight(e.target.value)} />
+        <input type='text' value={price} placeholder='Price' onChange={e => setPrice(e.target.value)} />
+        <input type='text' value={description} placeholder='Description' onChange={e => setDescription(e.target.value)} />
+        <button type='submit'>ADD PRODUCT</button>
       </form>
 
       <h2>Products List</h2>
