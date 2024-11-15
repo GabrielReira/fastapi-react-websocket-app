@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import { fetchProducts, createProduct, subscribeToWebsocket } from './services/api';
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -9,20 +10,13 @@ function App() {
 
   useEffect (() => {
     // HTTP first request to load products
-    fetch('http://localhost:8000/products/')
-      .then((response) => response.json())
-      .then((data) => setProducts(data))
-      .catch((error) => console.error(error))
+    fetchProducts().then((data) => setProducts(data));
 
     // Connect to WebSocket to retrieve newly products in real-time
-    const socket = new WebSocket('ws://localhost:8000/ws');
-    socket.onmessage = (event) => {
-      const updateProducts = JSON.parse(event.data);
-      setProducts(updateProducts);
-    }
-    socket.onerror = (error) => {
-      console.error(error);
-    }
+    const socket = subscribeToWebsocket(
+      (newProduct) => setProducts(newProduct),
+      (error) => console.error('Websocket error:', error)
+    );
 
     return () => socket.close();
   }, []);
@@ -36,18 +30,12 @@ function App() {
       price: parseFloat(price),
       description: description
     };
-    fetch('http://localhost:8000/products/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newProduct)
-    })
-      .then((response) => response.json())
-      .then(() => {
-        setName('');
-        setWeight('');
-        setPrice('');
-        setDescription('');
-      }).catch((error) => console.error(error))
+    createProduct(newProduct).then(() => {
+      setName('');
+      setWeight('');
+      setPrice('');
+      setDescription('');
+    });
   }
 
   return (
