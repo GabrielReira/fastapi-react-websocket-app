@@ -1,7 +1,9 @@
 import './App.css';
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
+import CreateProductCard from './components/createProductCard';
+import ProductInfoCard from './components/productInfoCard';
 import { fetchProducts, createProduct, subscribeToWebsocket } from './services/api';
-import { Container, Box, Grid2, TextField, Button, Card, CardContent, Grid } from '@mui/material';
+import { Container, Box, Grid2 } from '@mui/material';
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -10,7 +12,7 @@ function App() {
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
 
-  useEffect (() => {
+  useEffect(() => {
     // HTTP first request to load products
     fetchProducts().then((data) => setProducts(data));
 
@@ -41,71 +43,25 @@ function App() {
   }
 
   return (
-    <Container>
-      <Box className='createProductCard' component='form' onSubmit={handleSubmit}>
-        <h2>Create a Product</h2>
-        <Grid2 container spacing={1}>
-          <Grid2 item size={4}>
-            <TextField
-              label='Name'
-              value={name}
-              onChange={e => setName(e.target.value)}
-              required
-              fullWidth
-            />
-          </Grid2>
-          <Grid2 item size={4}>
-            <TextField
-              label='Price (€)'
-              value={price}
-              onChange={e => setPrice(e.target.value)}
-              type='number'
-              required
-              fullWidth
-            />
-          </Grid2>
-          <Grid2 item size={4}>
-            <TextField
-              label='Weight (kg)'
-              value={weight}
-              onChange={e => setWeight(e.target.value)}
-              type='number'
-              fullWidth
-            />
-          </Grid2>
-          <Grid2 item size={12}>
-            <TextField
-              label='Description'
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              multiline
-              rows={2}
-              fullWidth
-            />
-          </Grid2>
-        </Grid2>
-        <Grid2 className='addProductBtn'>
-          <Button type='submit' variant='contained' fullWidth>
-            Add product
-          </Button>
-        </Grid2>
-      </Box>
-
-      <Box className='infoProductCard'>
+    <Container className='App'>
+      <h1 className='title'>Gabriel's App</h1>
+      <CreateProductCard
+        name={name}
+        setName={setName}
+        price={price}
+        setPrice={setPrice}
+        weight={weight}
+        setWeight={setWeight}
+        description={description}
+        setDescription={setDescription}
+        handleSubmit={handleSubmit}
+      />
+      <Box className='productsListBox'>
         <h2>Products List</h2>
         <Grid2 container spacing={1}>
-            {products.map((product, index) => (
-              <Grid2 item size={4} key={index}>
-                <Card>
-                  <CardContent>
-                    {product.name} <br/>
-                    €{product.price} <br/>
-                    {product.weight}kg <br/>
-                    {product.description}
-                  </CardContent>
-                </Card>
-              </Grid2>
-            ))}
+          {products.map((product, index) => (
+            <ProductInfoCard key={index} product={product} />
+          ))}
         </Grid2>
       </Box>
     </Container>

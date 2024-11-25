@@ -1,10 +1,15 @@
-.createProductCard, .infoProductCard {
+.App {
+  margin: 0% 2.5%;
+  font-family: 'Roboto';
+}
+
+.title {
+  text-align: center;
+}
+
+.productsListBox {
   border: 1px solid #ddd;
   border-radius: 16px;
   padding: 0 16px 16px 16px;
   margin: 16px;
-}
-
-.addProductBtn {
-  margin: 8px 0;
 }
